@@ -1,5 +1,5 @@
 <template>
-  <h1>Está é a página de feedbacks</h1>
+  <h1>Esta é a página de feedbacks</h1>
 </template>
 
 <script>

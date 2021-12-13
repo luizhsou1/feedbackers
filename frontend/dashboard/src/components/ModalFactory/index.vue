@@ -3,7 +3,7 @@
     <div
       v-if="state.isActive"
       class="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50"
-      @click="handleModalToogle({ status: false })"
+      @click="handleModalToggle({ status: false })"
     >
       <div
         class="fixed mx-10"
@@ -45,20 +45,20 @@ export default {
     })
 
     onMounted(() => {
-      modal.listen(handleModalToogle)
+      modal.listen(handleModalToggle)
     })
 
     onBeforeUnmount(() => {
-      modal.off(handleModalToogle)
+      modal.off(handleModalToggle)
     })
 
-    function handleModalToogle (payload) {
+    function handleModalToggle (payload) {
       state.isActive = payload.status
 
       if (payload.status) {
         state.component = payload.component
         state.props = payload.props
-        state.width = payload.width ?? DEFAULT_WIDTH
+        state.width = payload.width
       } else {
         state.component = {}
         state.props = {}
@@ -68,7 +68,7 @@ export default {
 
     return {
       state,
-      handleModalToogle
+      handleModalToggle
     }
   }
 }
