@@ -74,13 +74,20 @@
 <script>
 import { reactive } from '@vue/reactivity'
 import { useField } from 'vee-validate'
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
+import Icon from '../Icon'
 import useModal from '../../hooks/useModal'
 import { joinValidations, validateEmpty, validateEmail, validateLength } from '../../utils/validators'
+import services from '../../services'
 
 export default {
+  components: { Icon },
   setup () {
     const modal = useModal()
+    const router = useRouter()
+    const toast = useToast()
 
     const {
       value: emailValue,
@@ -104,8 +111,41 @@ export default {
       }
     })
 
-    function handleSubmit () {
+    async function handleSubmit () {
+      try {
+        toast.clear()
+        state.isLoading = true
+        const { data, errors } = await services.auth.login({
+          email: state.email.value,
+          password: state.password.value
+        })
 
+        console.log({ data, errors })
+
+        if (!errors) {
+          window.localStorage.setItem('token', data.token)
+          router.push({ name: 'Feedbacks' })
+          modal.close()
+        } else {
+          if (errors.status === 404) {
+            toast.error('E-mail não encontrado!')
+          }
+
+          if (errors.status === 401) {
+            toast.error('E-mail ou senha inválidos!')
+          }
+
+          if (errors.status === 400) {
+            toast.error('Ocorreu um erro ao fazer o login!')
+          }
+        }
+
+        state.isLoading = false
+      } catch (error) {
+        state.isLoading = false
+        state.hasErrors = !!error
+        toast.error('Ocorreu um erro ao fazer o login!')
+      }
     }
 
     return {
